@@ -5,7 +5,9 @@
 #################################
 
 ## List below here, in a comment/comments, the people you worked with on this assignment AND any resources you used to find code (50 point deduction for not doing so). If none, write "None".
-
+#http://www.html.am/html-codes/forms/html-checkbox-code.cfm
+#https://openweathermap.org/current
+#Austin McCall
 
 
 ## [PROBLEM 1] - 150 points
@@ -48,13 +50,49 @@ def fave_number():
 	"""
 	return p
 
-@app.route('/result', methods = ['POST'])
+@app.route('/result', methods = ['GET','POST'])
 def display_result():
 	if request.method == 'POST':
 		number = int(request.form['fave_number'])
 		number = number * 2
 	return ("Double your favorite number is: " + str(number))
 
+@app.route('/problem4form', methods = ['GET','POST'])
+def problem4():
+	p = """
+	<!DOCTYPE html>
+	<html>
+	<body>
+	Weather Search
+	<form action = "/problem4form" method = "POST">
+	Enter a 5-digit US zip code to do a weather search:<br>
+	<input type = "text" name = "entered_zip"><br>
+	In what units would you like to see temperature displayed (select at least one)?<br>
+	<input type = "checkbox" name = "unit" value = "f"> Fahrenheit<br>
+	<input type = "checkbox" name = "unit" value = "c"> Celsius<br>
+	<input type = "checkbox" name = "unit" value = "k"> Kelvin<br>
+	<input type = "submit" value = "Submit">
+	</form>
+	</body>
+	</html>
+	"""
+	if request.method == 'POST':
+		req = requests.get('http://api.openweathermap.org/data/2.5/weather?zip=' + request.form['entered_zip'] + '&APPID=PUT API KEY HERE FROM OPEN WEATHER MAP')
+		json_dict = json.loads(req.text)
+		requested_units = dict(request.form)['unit']
+		ans = "The weather in " + str(json_dict['name']) + " is " + str(json_dict['weather'][0]['description'] + ".")
+		ans2 = ""
+		if ('k' in requested_units):
+			ans2 += "<br>It is " + str(int(json_dict['main']['temp'])) + " degrees Kelvin."
+		if ('f' in requested_units):
+			fah = ((9 / 5) * (int(json_dict['main']['temp']) - 273)) + 32
+			ans2 += "<br>It is " + str(int(fah)) + " degrees Fahrenheit."
+		if ('c' in requested_units):
+			cel = int(json_dict['main']['temp']) - 273
+			ans2 += "<br>It is " + str(cel) + " degrees Celsius."
+		return (p + ans + ans2)
+	else:
+		return p
 
 if __name__ == '__main__':
     app.run()
