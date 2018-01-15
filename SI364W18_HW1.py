@@ -14,6 +14,8 @@
 from flask import Flask
 app = Flask(__name__)
 app.debug = True
+import requests
+import json
 
 @app.route('/')
 def hello_to_you():
@@ -22,6 +24,12 @@ def hello_to_you():
 @app.route('/class')
 def SI364_Welcome():
 	return 'Welcome to SI 364!'
+
+@app.route('/movie/<movie_name>')
+def movie_dict(movie_name):
+	req = requests.get('https://itunes.apple.com/search?term=' + movie_name + '&media=movie')
+	dict_text = json.loads(req.text)
+	return str(dict_text)
 
 if __name__ == '__main__':
     app.run()
