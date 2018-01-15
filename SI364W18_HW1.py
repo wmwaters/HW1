@@ -18,6 +18,7 @@ app = Flask(__name__)
 app.debug = True
 import requests
 import json
+import api_key_info
 
 @app.route('/')
 def hello_to_you():
@@ -77,7 +78,7 @@ def problem4():
 	</html>
 	"""
 	if request.method == 'POST':
-		req = requests.get('http://api.openweathermap.org/data/2.5/weather?zip=' + request.form['entered_zip'] + '&APPID=PUT API KEY HERE FROM OPEN WEATHER MAP')
+		req = requests.get('http://api.openweathermap.org/data/2.5/weather?zip=' + request.form['entered_zip'] + '&APPID=' + api_key_info.api_key)
 		json_dict = json.loads(req.text)
 		requested_units = dict(request.form)['unit']
 		ans = "The weather in " + str(json_dict['name']) + " is " + str(json_dict['weather'][0]['description'] + ".")
