@@ -11,7 +11,7 @@
 ## [PROBLEM 1] - 150 points
 ## Below is code for one of the simplest possible Flask applications. Edit the code so that once you run this application locally and go to the URL 'http://localhost:5000/class', you see a page that says "Welcome to SI 364!"
 
-from flask import Flask
+from flask import Flask, request
 app = Flask(__name__)
 app.debug = True
 import requests
@@ -30,6 +30,31 @@ def movie_dict(movie_name):
 	req = requests.get('https://itunes.apple.com/search?term=' + movie_name + '&media=movie')
 	dict_text = json.loads(req.text)
 	return str(dict_text)
+
+@app.route('/question')
+def fave_number():
+	p = """
+	<!DOCTYPE html>
+	<html>
+	<body>
+	<form action = "/result" method = "POST">
+	Your favorite number:<br>
+	<input type = "text" name = "fave_number">
+	<br>
+	<input type = "submit" value = "Submit">
+	</form>
+	</body>
+	</html>
+	"""
+	return p
+
+@app.route('/result', methods = ['POST'])
+def display_result():
+	if request.method == 'POST':
+		number = int(request.form['fave_number'])
+		number = number * 2
+	return ("Double your favorite number is: " + str(number))
+
 
 if __name__ == '__main__':
     app.run()
